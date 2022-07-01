@@ -19,16 +19,18 @@ import javax.swing.GroupLayout.Alignment;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 import java.awt.event.ActionEvent;
 
 public class LottoEndPage extends JDialog {
 
-	public LottoEndPage(JFrame owner, int gameCount) {
+	public LottoEndPage(JFrame owner, User user, List<Integer> winNumber, int bonusNumber, int gameCount) {
 		super(owner, true);
+
+		gameCount++;
 
 		JPanel pnlLotto = new JPanel();
 		JPanel pnlTop = new JPanel(); // 당첨번호
-		
 
 		TitledBorder tbNumber = new TitledBorder(new LineBorder(Color.black), "당첨번호");
 		tbNumber.setTitleColor(new Color(245, 136, 110));
@@ -45,10 +47,13 @@ public class LottoEndPage extends JDialog {
 
 		pnlTop.setBorder(tbNumber);
 		pnlTop.setLayout(new BorderLayout(0, 0));
-		JLabel lblRound = new JLabel("" + " 님의"); // 회차
+		JLabel lblRound = new JLabel(user.getName() + " 님의"); // 회차
 		pnlTop.add(lblRound, BorderLayout.NORTH);
 		JLabel lblLotto = new JLabel("당첨번호는");
 		pnlTop.add(lblLotto, BorderLayout.WEST);
+		JLabel lblWin = new JLabel();
+		lblWin.setText(" \t\t\t" + String.valueOf(winNumber) + " + " + bonusNumber);
+		pnlTop.add(lblWin, BorderLayout.CENTER);
 		JLabel lblLotto2 = new JLabel("입니다.");
 		pnlTop.add(lblLotto2, BorderLayout.EAST);
 		pnlLotto.add(pnlTop);
@@ -67,12 +72,27 @@ public class LottoEndPage extends JDialog {
 		for (int i = 0; i < lblResult.length; i++) {
 			lblResult[i] = new JLabel((i + 1) + " 미지정");
 		}
-
-		for (int i = 0; i < pnlResultBox.length; i++) {
+		
+		// 번호를 넣을 라벨을 만들기
+		JLabel[] lblInputNum = new JLabel[user.getLottoNumber().size()];
+		for (int i = 0; i < user.getLottoNumber().size(); i++) {
+			lblInputNum[i] = new JLabel();
+			lblInputNum[i].setText(user.getLottoNumber().get(i).toString());
+		}
+//		System.out.println(user.getLottoNumber());
+		
+		for (int i = 0; i < user.getLottoNumber().size(); i++) {
 			pnlCenter.add(pnlResultBox[i]);
 			pnlResultBox[i].setLayout(new BorderLayout(0, 0));
 			pnlResultBox[i].add(lblResult[i], BorderLayout.WEST);
+			pnlResultBox[i].add(lblInputNum[i],BorderLayout.CENTER);
 		}
+		
+//		for (int i = 0; i < pnlResultBox.length; i++) {
+//			pnlCenter.add(pnlResultBox[i]);
+//			pnlResultBox[i].setLayout(new BorderLayout(0, 0));
+//			pnlResultBox[i].add(lblResult[i], BorderLayout.WEST);
+//		}
 
 		pnlCenter.setBorder(tbResult);
 		pnlCenter.setLayout(new BoxLayout(pnlCenter, BoxLayout.Y_AXIS));

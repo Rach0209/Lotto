@@ -1,13 +1,21 @@
 
-
 import java.util.List;
 
 public class User {
 	String pw;
 	String name;
+	String phoneNum;
 	boolean Premier;
 	int haveMoney;
-	List<Integer> lottoNumber;
+	List<List<Integer>> lottoNumber;
+
+	public String getPhoneNum() {
+		return phoneNum;
+	}
+
+	public void setPhoneNum(String phoneNum) {
+		this.phoneNum = phoneNum;
+	}
 
 	public String getPw() {
 		return pw;
@@ -25,7 +33,7 @@ public class User {
 		return haveMoney;
 	}
 
-	public List<Integer> getLottoNumber() {
+	public List<List<Integer>> getLottoNumber() {
 		return lottoNumber;
 	}
 
@@ -45,7 +53,7 @@ public class User {
 		this.haveMoney = haveMoney;
 	}
 
-	public void setLottoNumber(List<Integer> lottoNumber) {
+	public void setLottoNumber(List<List<Integer>> lottoNumber) {
 		this.lottoNumber = lottoNumber;
 	}
 
