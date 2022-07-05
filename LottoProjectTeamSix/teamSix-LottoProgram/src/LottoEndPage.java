@@ -15,20 +15,30 @@ import javax.swing.border.TitledBorder;
 import javax.swing.SpringLayout;
 import java.awt.FlowLayout;
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.GroupLayout.Alignment;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.awt.event.ActionEvent;
+import java.awt.Point;
+import javax.swing.SwingConstants;
 
 public class LottoEndPage extends JDialog {
 
-	public LottoEndPage(JFrame owner, User user, List<Integer> winNumber, int bonusNumber, int gameCount) {
+	private int winMoney = 0;
+
+	public int getWinMoney() {
+		return winMoney;
+	}
+
+	public LottoEndPage(JFrame owner, User user, List<Integer> winNumber, int bonusNumber, int gameCount,
+			Map<String, User> userInfo) {
 		super(owner, true);
-
-		gameCount++;
-
+		setTitle("당첨 결과");
 		JPanel pnlLotto = new JPanel();
 		JPanel pnlTop = new JPanel(); // 당첨번호
 
@@ -47,12 +57,30 @@ public class LottoEndPage extends JDialog {
 
 		pnlTop.setBorder(tbNumber);
 		pnlTop.setLayout(new BorderLayout(0, 0));
-		JLabel lblRound = new JLabel(user.getName() + " 님의"); // 회차
+		JLabel lblRound = new JLabel(gameCount + "회차"); // 회차
 		pnlTop.add(lblRound, BorderLayout.NORTH);
 		JLabel lblLotto = new JLabel("당첨번호는");
 		pnlTop.add(lblLotto, BorderLayout.WEST);
-		JLabel lblWin = new JLabel();
-		lblWin.setText(" \t\t\t" + String.valueOf(winNumber) + " + " + bonusNumber);
+
+		// 당첨번호 부분 이미지 삽입 완료
+		JPanel lblWin = new JPanel();
+		JLabel[] lblWinIcon = new JLabel[winNumber.size()];
+		JLabel plus = new JLabel(new ImageIcon(Lotto.class.getClassLoader().getResource("images/Plus.png")));
+		JLabel bonuseIcon = new JLabel(new ImageIcon(Lotto.class.getClassLoader()
+				.getResource("images/middle" + String.format("%02d", bonusNumber) + ".png")));
+		for (int i = 0; i < winNumber.size(); i++) {
+			lblWinIcon[i] = new JLabel();
+			lblWin.add(lblWinIcon[i]);
+			int num = winNumber.get(i);
+			URL url = Lotto.class.getClassLoader().getResource("images/middle" + String.format("%02d", num) + ".png");
+			ImageIcon icon = new ImageIcon(url);
+			lblWinIcon[i].setIcon(icon);
+		}
+		lblWin.setLayout(new GridLayout(0, 8, 0, 0));
+		lblWin.add(plus);
+		lblWin.add(bonuseIcon);
+
+		// lblWin.setText(String.valueOf(winNumber) + " + " + bonusNumber);
 		pnlTop.add(lblWin, BorderLayout.CENTER);
 		JLabel lblLotto2 = new JLabel("입니다.");
 		pnlTop.add(lblLotto2, BorderLayout.EAST);
@@ -67,27 +95,97 @@ public class LottoEndPage extends JDialog {
 		for (int i = 0; i < pnlResultBox.length; i++) {
 			pnlResultBox[i] = new JPanel();
 		}
+		// 574673e;
+//		JLabel[] lblResult = new JLabel[5];
+//		for (int i = 0; i < lblResult.length; i++) {
+//			lblResult[i] = new JLabel((i + 1) + " 미지정");
+//		}
 
-		JLabel[] lblResult = new JLabel[5];
-		for (int i = 0; i < lblResult.length; i++) {
-			lblResult[i] = new JLabel((i + 1) + " 미지정");
-		}
-		
 		// 번호를 넣을 라벨을 만들기
-		JLabel[] lblInputNum = new JLabel[user.getLottoNumber().size()];
+//		JPanel[] lblResultNum = new JPanel[5];
+//		for (int i = 0; i < iconlbl.length; i++) {
+//			lblResultNum[i] = new JPanel();
+//			for (int j = 0; j < iconlbl[i].length; j++) {
+//				iconlbl[i][j] = new JLabel();
+//				lblResultNum[i].add(iconlbl[i][j]);
+//			}
+//		}
+
+		JPanel[] lblInputNum = new JPanel[user.getLottoNumber().size()];
+		JLabel[][] iconlbl = new JLabel[user.getLottoNumber().size()][6];
+		JLabel[] winCountLbl = new JLabel[user.getLottoNumber().size()];
+		// 당첨 이미지 삽입완료
 		for (int i = 0; i < user.getLottoNumber().size(); i++) {
-			lblInputNum[i] = new JLabel();
-			lblInputNum[i].setText(user.getLottoNumber().get(i).toString());
+
+			int winCount = 0;
+			lblInputNum[i] = new JPanel();
+			winCountLbl[i] = new JLabel();
+
+			for (int j = 0; j < user.getLottoNumber().get(i).size(); j++) {
+				iconlbl[i][j] = new JLabel();
+				lblInputNum[i].add(iconlbl[i][j], BorderLayout.CENTER);
+				int num = user.getLottoNumber().get(i).get(j);
+				URL url = Lotto.class.getClassLoader()
+						.getResource("images/middleun" + String.format("%02d", num) + ".png");
+				URL url2 = Lotto.class.getClassLoader().getResource("images/" + String.format("%02d", num) + ".png");
+				ImageIcon icon = new ImageIcon(url);
+				ImageIcon icon2 = new ImageIcon(url2);
+
+				for (int k = 0; k < 6; k++) {
+					if (winNumber.get(k) == num) {
+						iconlbl[i][j].setIcon(icon2);
+						winCount++;
+						break;
+					} else {
+						iconlbl[i][j].setIcon(icon);
+					}
+				}
+
+				// 당첨금 초기화
+				if (j == 5) {
+					switch (winCount) {
+					case 3:
+						winCountLbl[i].setText("5등 당첨 !");
+						winMoney += 5000;
+
+						break;
+					case 4:
+						winCountLbl[i].setText("4등 당첨 !");
+						winMoney += 50000;
+						break;
+					case 5:
+						if (bonusNumber == user.getLottoNumber().get(i).get(j)) {
+							winCountLbl[i].setText("2등 당첨 !");
+							iconlbl[i][j].setIcon(icon2);
+							winMoney += 100000000;
+						} else {
+							winCountLbl[i].setText("3등 당첨 !");
+							winMoney += 1000000;
+						}
+						break;
+					case 6:
+						winCountLbl[i].setText("1등 당첨 !");
+						winMoney += 1000000000;
+						break;
+					default:
+						winCountLbl[i].setText("낙첨 ㅠㅠ");
+						break;
+					}
+				}
+//				winCountLbl[i].setText(String.valueOf(winCount) + "개 맞음");
+			}
+//			lblInputNum[i].setText(user.getLottoNumber().get(i).toString());
 		}
-//		System.out.println(user.getLottoNumber());
-		
+
 		for (int i = 0; i < user.getLottoNumber().size(); i++) {
 			pnlCenter.add(pnlResultBox[i]);
 			pnlResultBox[i].setLayout(new BorderLayout(0, 0));
-			pnlResultBox[i].add(lblResult[i], BorderLayout.WEST);
-			pnlResultBox[i].add(lblInputNum[i],BorderLayout.CENTER);
+//			pnlResultBox[i].add(lblResult[i], BorderLayout.WEST);
+			pnlResultBox[i].add(Lotto.lblResult2[i], BorderLayout.WEST);
+			pnlResultBox[i].add(lblInputNum[i]);
+			pnlResultBox[i].add(winCountLbl[i], BorderLayout.EAST);
 		}
-		
+
 //		for (int i = 0; i < pnlResultBox.length; i++) {
 //			pnlCenter.add(pnlResultBox[i]);
 //			pnlResultBox[i].setLayout(new BorderLayout(0, 0));
@@ -104,15 +202,17 @@ public class LottoEndPage extends JDialog {
 		sl_pnlLotto.putConstraint(SpringLayout.SOUTH, pnlCenter, -6, SpringLayout.NORTH, pnlSouth);
 		sl_pnlLotto.putConstraint(SpringLayout.EAST, pnlSouth, 0, SpringLayout.EAST, pnlTop);
 		sl_pnlLotto.putConstraint(SpringLayout.WEST, pnlSouth, 10, SpringLayout.WEST, pnlLotto);
+
 		JLabel lblWon = new JLabel("원");
 		pnlSouth.setBorder(tbMoney);
 		pnlSouth.setLayout(new BorderLayout(0, 0));
 
+		JLabel lblNewLabel = new JLabel(String.valueOf(winMoney));
+		lblNewLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		pnlSouth.add(lblNewLabel, BorderLayout.CENTER);
+
 		pnlSouth.add(lblWon, BorderLayout.EAST);
 		pnlLotto.add(pnlSouth);
-
-		JLabel lblNewLabel = new JLabel("New label");
-		pnlSouth.add(lblNewLabel, BorderLayout.WEST);
 
 		JButton btnReplay = new JButton("다시하기");
 		sl_pnlLotto.putConstraint(SpringLayout.NORTH, btnReplay, 6, SpringLayout.SOUTH, pnlSouth);
@@ -129,18 +229,7 @@ public class LottoEndPage extends JDialog {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				String[] yesNo = { "로그아웃", "종료", "취소" };
-				int result = JOptionPane.showOptionDialog(LottoEndPage.this, "종료하시겠습니까?", "종료 및 로그아웃",
-						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, yesNo, yesNo[0]);
-				if (result == JOptionPane.YES_OPTION) {
-					dispose();
-					owner.dispose();
-					LottoEndPage.this.dispose();
-					new Login().setVisible(true);
-					LottoEndPage.this.dispose();
-				} else if (result == JOptionPane.NO_OPTION) {
-					System.exit(0);
-				}
+				dispose();
 			}
 
 		});
@@ -156,5 +245,7 @@ public class LottoEndPage extends JDialog {
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		// 창의 크기를 조절할수 없게끔
 		setResizable(false);
+		// 창이 중앙에 뜨게끔
+		setLocationRelativeTo(null);
 	}
 }

@@ -33,9 +33,9 @@ public class Login extends JFrame {
 	ImageIcon i = new ImageIcon(url);
 	Image im = i.getImage();
 
-	SignUp signUp = new SignUp(Login.this);
+	static SignUp signUp = new SignUp(null);
 
-	private Map<String, User> userInfo = signUp.getMap();
+	private static Map<String, User> userInfo = signUp.getMap();
 
 	public SignUp getSignUp() {
 		return signUp;
@@ -44,9 +44,9 @@ public class Login extends JFrame {
 	public void setSignUp(SignUp signUp) {
 		this.signUp = signUp;
 	}
-
+	
 	// 생성자
-	Login() {
+	Login(Map<String, User> userInfo) {
 		userInfo.put("admin", new User());
 		userInfo.get("admin").setName("관리자");
 		userInfo.get("admin").setPw("qwqw1234");
@@ -88,8 +88,8 @@ public class Login extends JFrame {
 		JLabel lbl2 = new JLabel("비밀번호");
 		JPasswordField pf = new JPasswordField(10);
 		
-		tf.setText("admin");
-		pf.setText("qwqw1234");
+//		tf.setText("admin");
+//		pf.setText("qwqw1234");
 		pwPnl.add(lbl2);
 		pwPnl.add(pf);
 
@@ -156,7 +156,7 @@ public class Login extends JFrame {
 		menuPnl.add(lblImgLabel);
 //		pnl.add(bgLbl);
 
-		setSize(602, 421);
+		setSize(600, 420);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 	}
@@ -171,6 +171,6 @@ public class Login extends JFrame {
 
 	// 메인
 	public static void main(String[] args) {
-		new Login().setVisible(true);
+		new Login(userInfo).setVisible(true);
 	}
 }
